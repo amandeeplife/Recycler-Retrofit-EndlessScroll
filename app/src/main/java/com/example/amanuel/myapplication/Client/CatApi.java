@@ -1,6 +1,6 @@
 package com.example.amanuel.myapplication.Client;
 
- import com.example.amanuel.myapplication.model.Cat;
+import com.example.amanuel.myapplication.model.Cat;
 
 import java.util.List;
 

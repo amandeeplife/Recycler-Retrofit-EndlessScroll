@@ -27,19 +27,19 @@ public class MainActivity extends AppCompatActivity {
     private CustomAdapter adapter;
     private ProgressBar progressBar;
     private GridLayoutManager layoutManager;
-    private  int page_num = 2;
+    private int page_num = 2;
     private CatApi catApi;
     private boolean isLoding = true;
-    private int preivoustotal,visibleItemCount,totalItemCout,pastVisibleItems=0;
-    private int view_threashhold=10;
+    private int preivoustotal, visibleItemCount, totalItemCout, pastVisibleItems = 0;
+    private int view_threashhold = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        progressBar =findViewById(R.id.myprogressbar);
+        progressBar = findViewById(R.id.myprogressbar);
         recyclerView = findViewById(R.id.myRecyclerview);
-        layoutManager = new GridLayoutManager(this,2);
+        layoutManager = new GridLayoutManager(this, 2);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(layoutManager);
         catApi = ApiClient.getApiClient().create(CatApi.class);
@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<List<Cat>> call, Response<List<Cat>> response) {
                 List<Cat> cats = response.body();
-                adapter = new CustomAdapter(cats,MainActivity.this);
+                adapter = new CustomAdapter(cats, MainActivity.this);
                 recyclerView.setAdapter(adapter);
                 progressBar.setVisibility(View.GONE);
 
@@ -64,33 +64,42 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-
-                if(dy>0) {
-                    ++page_num;
+                visibleItemCount = layoutManager.getChildCount();
+                totalItemCout = layoutManager.getItemCount();
+                pastVisibleItems = layoutManager.findFirstVisibleItemPosition();
+                if (dy > 0) {
+                    if (isLoding) {
+                        if (totalItemCout > preivoustotal) {
+                            isLoding = false;
+                            preivoustotal = totalItemCout;
+                        }
+                    }
+                    if (!isLoding && (totalItemCout - visibleItemCount <= pastVisibleItems + view_threashhold))
+                        page_num += 1;
                     performPagination();
-                    progressBar.setVisibility(View.VISIBLE);
-
-                }}
+                    isLoding = true;
+                }
+            }
         });
     }
+
     private void performPagination() {
         Call<List<Cat>> call2 = catApi.getCats(page_num);
-//        progressBar.setVisibility(View.VISIBLE);
-    call2.enqueue(new Callback<List<Cat>>() {
-        @Override
-        public void onResponse(Call<List<Cat>> call, Response<List<Cat>> response) {
-            Toast.makeText(MainActivity.this,"dd",Toast.LENGTH_LONG).show();
+        progressBar.setVisibility(View.VISIBLE);
+        call2.enqueue(new Callback<List<Cat>>() {
+            @Override
+            public void onResponse(Call<List<Cat>> call, Response<List<Cat>> response) {
+                Toast.makeText(MainActivity.this, "dd", Toast.LENGTH_LONG).show();
+                List<Cat> cats = response.body();
+                adapter.addMoreCats(cats);
+                progressBar.setVisibility(View.GONE);
 
-            List<Cat> cats = response.body();
-            adapter.addMoreCats(cats);
-            progressBar.setVisibility(View.GONE);
+            }
 
-        }
+            @Override
+            public void onFailure(Call<List<Cat>> call, Throwable t) {
 
-        @Override
-        public void onFailure(Call<List<Cat>> call, Throwable t) {
-
-        }
-    });
+            }
+        });
     }
 }

@@ -18,23 +18,25 @@ import java.util.List;
 
 public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHolder> {
 
-   private List<Cat> cats;
-   private Context context;
-   public CustomAdapter(List<Cat> cats, Context context){
-       this.cats = cats;
-       this.context = context;
-   }
+    private List<Cat> cats;
+    private Context context;
+
+    public CustomAdapter(List<Cat> cats, Context context) {
+        this.cats = cats;
+        this.context = context;
+    }
+
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-       View view = LayoutInflater.from(context).inflate(R.layout.custom_row,parent,false);
-       return new MyViewHolder(view);
+        View view = LayoutInflater.from(context).inflate(R.layout.custom_row, parent, false);
+        return new MyViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         Cat cat = cats.get(position);
-        holder.title.setText( cat.getTitle());
+        holder.title.setText(cat.getTitle());
         holder.description.setText(cat.getDescription());
         holder.date.setText(cat.getTimestamp());
         Picasso.get().load(cat.getImage_url()).into(holder.imageView);
@@ -45,7 +47,8 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
     public int getItemCount() {
         return cats.size();
     }
-    public static class MyViewHolder extends RecyclerView.ViewHolder{
+
+    public static class MyViewHolder extends RecyclerView.ViewHolder {
         TextView title;
         TextView date;
         TextView description;
@@ -59,8 +62,9 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
             imageView = itemView.findViewById(R.id.myImage);
         }
     }
-    public void addMoreCats(List<Cat> cats){
-       this.cats.addAll(cats);
-       notifyDataSetChanged();
+
+    public void addMoreCats(List<Cat> cats) {
+        this.cats.addAll(cats);
+        notifyDataSetChanged();
     }
 }
